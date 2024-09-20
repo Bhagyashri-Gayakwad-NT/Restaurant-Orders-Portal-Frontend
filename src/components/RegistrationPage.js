@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './RegistrationPage.css';
 
 const RegistrationPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  let [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
   const [role, setRole] = useState('USER');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const validateFirstName = (firstName) => {
-    const re = /^[A-Z][a-zA-Z]{2,}$/;
+    const re = /^[A-Z][a-zA-Z]*$/;
     return re.test(firstName);
   };
 
   const validateLastName = (lastName) => {
-    const re = /^[A-Z][a-zA-Z]{2,}$/;
+    const re = /^[A-Z][a-zA-Z]*$/;
     return re.test(lastName);
   };
 
   const validateEmail = (email) => {
     const re = /^[A-Za-z0-9._%+-]+@nucleusteq\.com$/;
-    return re.test(String(email).toLowerCase());
+    return re.test(email.trim());
   };
 
   const validatePassword = (password) => {
@@ -45,25 +47,31 @@ const RegistrationPage = () => {
     if (!firstName) {
       validationErrors.firstName = 'First name is required.';
     } else if (!validateFirstName(firstName)) {
-      validationErrors.firstName = 'Name must start with a capital letter and be at least three characters long.';
+      validationErrors.firstName = 'First name must start with a capital letter.';
     }
 
     if (!lastName) {
       validationErrors.lastName = 'Last name is required.';
     } else if (!validateLastName(lastName)) {
-      validationErrors.lastName = 'Name must start with a capital letter and be at least three characters long.';
+      validationErrors.lastName = 'Last name must start with a capital letter.';
     }
 
     if (!email) {
       validationErrors.email = 'Email is required.';
     } else if (!validateEmail(email)) {
-      validationErrors.email = 'Email must end with @nucleusteq.com.';
+      validationErrors.email = 'Email must end with @nucleusteq.com and contain no spaces.';
     }
 
     if (!password) {
       validationErrors.password = 'Password is required.';
     } else if (!validatePassword(password)) {
       validationErrors.password = 'Password must be at least 6 characters long and include at least one uppercase letter, one digit, and one special character.';
+    }
+
+    if (!confirmPassword) {
+      validationErrors.confirmPassword = 'Please confirm your password.';
+    } else if (password !== confirmPassword) {
+      validationErrors.confirmPassword = 'Passwords do not match.';
     }
 
     if (!phoneNo) {
@@ -79,23 +87,23 @@ const RegistrationPage = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await fetch('http://localhost:100/users/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ firstName, lastName, email, password: encodedPassword, phoneNo, role }),
+        const response = await axios.post('http://localhost:100/users/register', {
+          firstName,
+          lastName,
+          email: email.trim(),
+          password: encodedPassword,
+          phoneNo,
+          role,
         });
 
-        const data = await response.json();
-        if (response.ok) {
-        navigate('/login');
+        if (response.status === 201) {
+          navigate('/login');
         } else {
-          setErrors({ form: data.message || 'Registration failed' });
+          setErrors({ form: response.data.message || 'Registration failed xyz' });
         }
-        
       } catch (error) {
-        setErrors({ form: 'An error occurred. Please try again.' });
+        console.error(error.response.data.message)
+        setErrors({form: error.response.data.message});
       }
     }
   };
@@ -140,6 +148,15 @@ const RegistrationPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           {errors.password && <p className="error">{errors.password}</p>}
+        </div>
+        <div className="form-group">
+          <label>Confirm Password:</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
         </div>
         <div className="form-group">
           <label>Phone Number:</label>

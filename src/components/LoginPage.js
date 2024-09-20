@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -8,48 +9,55 @@ const LoginPage = () => {
   const [error, setError] = useState({});
   const navigate = useNavigate();
 
-  const validateEmail = (email) => /^[A-Za-z0-9._%+-]+@nucleusteq\.com$/.test(email);
+  const validateEmail = (email) => {
+    const re = /^[A-Za-z0-9._%+-]+@nucleusteq\.com$/;
+    return re.test(String(email).toLowerCase());
+  };
 
+  const validatePassword = (password) => {
+    const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{6,}$/;
+    return re.test(password);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const errors = {};
+    const validationErrors = {};
 
-  
-    if (!validateEmail(email)) {
-      errors.email = 'Email is required and must end with @nucleusteq.com';
+    if (!email) {
+      validationErrors.email = 'Email is required.';
+    } else if (!validateEmail(email)) {
+      validationErrors.email = 'Email must end with @nucleusteq.com.';
     }
 
-    if (password.length<=0) {
-      errors.password = 'Enter valid password';
+    if (!password) {
+      validationErrors.password = 'Password is required.';
+    } else if (!validatePassword(password)) {
+      validationErrors.password = 'Password must be at least 6 characters long and include at least one uppercase letter, one digit, and one special character.';
     }
 
-    if (Object.keys(errors).length > 0) {
-      setError(errors);
+    if (Object.keys(validationErrors).length > 0) {
+      setError(validationErrors);
       return;
     }
 
-    // const encodepassword = btoa(password);
-    password = btoa(password)
+    // Encode password
+    const encodedPassword = btoa(password);
 
     try {
-      const response = await fetch('http://localhost:100/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post('http://localhost:100/users/login', {
+        email,
+        password: encodedPassword,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
-        navigate(data.role === 'USER' ? '/UserDashboard' : '/RestaurantOwnerDashboard');
-      } else {
-        setError({ server: data.message || 'Login failed' });
-      }
+      // Store user ID in local storage
+      localStorage.setItem('userId', data.id);
+
+      // Redirect based on role
+      navigate(data.role === 'USER' ? '/UserDashboard' : '/RestaurantOwnerDashboard');
     } catch (error) {
-      setError({ server: 'An error occurred. Please try again.' });
+      setError({ server: error.response?.data?.message || 'An error occurred. Please try again.' });
     }
   };
 

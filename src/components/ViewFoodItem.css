@@ -1,0 +1,25 @@
+.view-food-item-container {
+    padding: 20px;
+  }
+  
+  .dropdown {
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .food-items-list {
+    margin-top: 20px;
+  }
+  
+  .food-items-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .food-items-list li {
+    margin-bottom: 10px;
+  }
+  
