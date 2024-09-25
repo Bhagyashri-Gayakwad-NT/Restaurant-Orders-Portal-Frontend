@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ViewFoodItem.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 const ViewFoodItem = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -11,6 +12,7 @@ const ViewFoodItem = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showAddFoodItemForm, setShowAddFoodItemForm] = useState(false);
 
   const [newFoodItem, setNewFoodItem] = useState({
     foodItemName: '',
@@ -19,7 +21,13 @@ const ViewFoodItem = () => {
     isAvailable: false,
     foodItemImage: null,
   });
-
+  const [editingFoodItem, setEditingFoodItem] = useState(null);
+  const [updatedFoodItem, setUpdatedFoodItem] = useState({
+    foodItemName: '',
+    description: '',
+    price: '',
+    foodItemImage: null,
+  });
   const userId = localStorage.getItem('userId');
 
   // Fetch restaurants based on user ID
@@ -33,8 +41,8 @@ const ViewFoodItem = () => {
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching restaurants!", error);
-          setError("Failed to load restaurants.");
+          console.error('Error fetching restaurants!', error);
+          setError('Failed to load restaurants.');
           setLoading(false);
         });
     }
@@ -51,8 +59,8 @@ const ViewFoodItem = () => {
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching categories!", error);
-          setError("Failed to load categories.");
+          console.error('Error fetching categories!', error);
+          setError('Failed to load categories.');
           setLoading(false);
         });
     }
@@ -69,8 +77,8 @@ const ViewFoodItem = () => {
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching food items!", error);
-          setError("Failed to load food items.");
+          console.error('Error fetching food items!', error);
+          setError('Failed to load food items.');
           setLoading(false);
         });
     }
@@ -87,8 +95,8 @@ const ViewFoodItem = () => {
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching all food items!", error);
-          setError("Failed to load all food items.");
+          console.error('Error fetching all food items!', error);
+          setError('Failed to load all food items.');
           setLoading(false);
         });
     }
@@ -137,15 +145,80 @@ const ViewFoodItem = () => {
           foodItemImage: null,
         });
         setError(null);
+        setShowAddFoodItemForm(false); // Hide form after adding food item
+        toast.success(response.data.message)
       })
       .catch((error) => {
-        console.error("Error adding food item!", error);
-        setError("Failed to add food item.");
+        const errors = error.response.data.errors;
+                Object.keys(errors).forEach((field) => {
+                    toast.error(errors[field]);
+                });
+
+        console.error('Error adding food item!', error);
+        setError('Failed to add food item.');
       });
   };
+  const handleEditFoodItem = (foodItem) => {
+    setEditingFoodItem(foodItem);
+    setUpdatedFoodItem({
+      foodItemName: foodItem.foodItemName,
+      description: foodItem.description,
+      price: foodItem.price,
+      foodItemImage: null,
+    });
+  };
 
+  const handleUpdateFoodItemChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedFoodItem((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleUpdateImageChange = (e) => {
+    setUpdatedFoodItem((prev) => ({
+      ...prev,
+      foodItemImage: e.target.files[0],
+    }));
+  };
+
+  const handleUpdateFoodItem = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('foodItemName', updatedFoodItem.foodItemName);
+    formData.append('description', updatedFoodItem.description);
+    formData.append('price', updatedFoodItem.price);
+    if (updatedFoodItem.foodItemImage) {
+      formData.append('foodItemImage', updatedFoodItem.foodItemImage);
+    }
+
+    axios
+      .put(`http://localhost:300/foodItems/updateFoodItem/${editingFoodItem.foodItemId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((response) => {
+        const updatedFoodItems = foodItems.map((item) =>
+          item.foodItemId === editingFoodItem.foodItemId ? { ...item, ...updatedFoodItem } : item
+        );
+        setFoodItems(updatedFoodItems);
+        setEditingFoodItem(null);
+        setError(null);
+        toast.success(response.data.message)
+      })
+      .catch((error) => {
+        const errors = error.response.data.errors;
+                Object.keys(errors).forEach((field) => {
+                    toast.error(errors[field]);
+                });
+        console.error('Error updating food item!', error);
+        setError('Failed to update food item.');
+      });
+  };
   const fetchFoodItemImage = (id) => {
-    return `http://localhost:300/foodItems/${id}/image`;  // Image URL for food items
+    return `http://localhost:300/foodItems/${id}/image`; // Image URL for food items
   };
 
   return (
@@ -153,7 +226,6 @@ const ViewFoodItem = () => {
       <h2>View and Add Food Items</h2>
 
       {loading && <p>Loading...</p>}
-      {error && <div className="error-message">{error}</div>}
 
       {/* Restaurant Dropdown */}
       <div className="dropdown">
@@ -240,6 +312,7 @@ const ViewFoodItem = () => {
                     className="food-item-image"
                   />
                   <strong>{item.foodItemName}</strong> - {item.description} - Rs{item.price}
+                  <button onClick={() => handleEditFoodItem(item)}>Edit Food Item</button>
                 </li>
               ))}
             </ul>
@@ -249,13 +322,23 @@ const ViewFoodItem = () => {
         </div>
       )}
 
-      {/* Add Food Item Form */}
+      {/* Toggle Button for Add Food Item Form */}
       {selectedCategoryId && (
+        <div className="toggle-add-food-item">
+          <button onClick={() => setShowAddFoodItemForm((prev) => !prev)}>
+            {showAddFoodItemForm ? 'Cancel Adding Food Item' : 'Add Food Item'}
+          </button>
+        </div>
+      )}
+
+      {/* Add Food Item Form */}
+      {showAddFoodItemForm && selectedCategoryId && (
         <div className="add-food-item">
           <h3>Add New Food Item</h3>
           <form onSubmit={handleAddFoodItem}>
             <div>
-              <label>Food Item Name:</label>
+              {/* <label>Food Item Name :</label> */}
+              <label>Food Item Name <span style={{ color: 'red' }}>*</span> </label>
               <input
                 type="text"
                 name="foodItemName"
@@ -265,17 +348,16 @@ const ViewFoodItem = () => {
               />
             </div>
             <div>
-              <label>Description:</label>
-              <input
-                type="text"
+            <label>Description <span style={{ color: 'red' }}>*</span> </label>
+              <textarea
                 name="description"
                 value={newFoodItem.description}
                 onChange={handleFoodItemChange}
                 required
-              />
+              ></textarea>
             </div>
             <div>
-              <label>Price:</label>
+            <label>Price <span style={{ color: 'red' }}>*</span> </label>
               <input
                 type="number"
                 name="price"
@@ -285,24 +367,78 @@ const ViewFoodItem = () => {
               />
             </div>
             <div>
-              <label>Available:</label>
-              <input
-                type="checkbox"
-                name="isAvailable"
-                checked={newFoodItem.isAvailable}
-                onChange={(e) =>
-                  setNewFoodItem((prev) => ({ ...prev, isAvailable: e.target.checked }))
-                }
-              />
+              <label>
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={newFoodItem.isAvailable}
+                  onChange={(e) =>
+                    setNewFoodItem((prev) => ({
+                      ...prev,
+                      isAvailable: e.target.checked,
+                    }))
+                  }
+                />
+                Available
+              </label>
             </div>
             <div>
-              <label>Food Item Image:</label>
-              <input type="file" accept="image/*" onChange={handleImageChange} required />
+              <label>Upload Food Item Image <span style={{ color: 'red' }}>*</span> </label>
+              <input type="file" name="foodItemImage" onChange={handleImageChange}
+              required
+               />
             </div>
-            <button type="submit">Add Food Item</button>
+            <div>
+              <button type="submit">Add Food Item</button>
+            </div>
           </form>
         </div>
       )}
+      {editingFoodItem && (
+        <div className="edit-food-item">
+          <h3>Edit Food Item</h3>
+          <form onSubmit={handleUpdateFoodItem}>
+            <div>
+              <label>Food Item Name <span style={{ color: 'red' }}>*</span> </label>
+              <input
+                type="text"
+                name="foodItemName"
+                value={updatedFoodItem.foodItemName}
+                onChange={handleUpdateFoodItemChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Description <span style={{ color: 'red' }}>*</span> </label>
+              <textarea
+                name="description"
+                value={updatedFoodItem.description}
+                onChange={handleUpdateFoodItemChange}
+                required
+              ></textarea>
+            </div>
+            <div>
+              <label>Price <span style={{ color: 'red' }}>*</span> </label>
+              <input
+                type="number"
+                name="price"
+                value={updatedFoodItem.price}
+                onChange={handleUpdateFoodItemChange}
+                required
+              />
+            </div>
+            <div>
+              <label>Upload New Food Item Image (optional):</label>
+              <input type="file" name="foodItemImage" onChange={handleUpdateImageChange} />
+            </div>
+            <div>
+              <button type="submit">Update Food Item</button>
+              <button type="button" onClick={() => setEditingFoodItem(null)}>Cancel</button>
+            </div>
+          </form>
+        </div>
+      )}
+<ToastContainer />
     </div>
   );
 };

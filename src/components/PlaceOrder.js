@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PlaceOrder = () => {
   // State to hold form data
@@ -49,7 +51,8 @@ const PlaceOrder = () => {
       const response = await axios.post('http://localhost:8080/orders/place', orderData, {
         headers: { 'Content-Type': 'application/json' },
       });
-      setMessage(response.data.message); // Assuming response contains a 'message' field
+      // setMessage(response.data.message); // Assuming response contains a 'message' field
+      toast.success(response.data.message);
     } catch (error) {
       setMessage('Error placing the order. Please try again.');
       console.error(error);

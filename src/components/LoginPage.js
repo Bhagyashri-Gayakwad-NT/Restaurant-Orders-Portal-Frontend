@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { UserContext } from './context/UserContext';  // Import the UserContext
 import './LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
-  let [password, setPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState({});
   const navigate = useNavigate();
+
+  const { loginUser } = useContext(UserContext);  // Get loginUser from the context
 
   const validateEmail = (email) => {
     const re = /^[A-Za-z0-9._%+-]+@nucleusteq\.com$/;
@@ -51,8 +54,8 @@ const LoginPage = () => {
 
       const data = response.data;
 
-      // Store user ID in local storage
-      localStorage.setItem('userId', data.id);
+      // Use loginUser to store the user in context and localStorage
+      loginUser(data);
 
       // Redirect based on role
       navigate(data.role === 'USER' ? '/UserDashboard' : '/RestaurantOwnerDashboard');

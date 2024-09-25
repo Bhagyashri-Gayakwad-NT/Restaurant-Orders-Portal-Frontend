@@ -5,11 +5,10 @@ import './UserDashboard.css';
 
 const UserDashboard = () => {
   const [profileData, setProfileData] = useState(null);
-  const [showProfile, setShowProfile] = useState(false); // State to control profile visibility
+  const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
 
-  // Fetch profile data once on component mount
   useEffect(() => {
     if (userId) {
       axios.get(`http://localhost:100/users/profile/${userId}`)
@@ -22,46 +21,40 @@ const UserDashboard = () => {
     }
   }, [userId]);
 
-  // Handle logout action
   const handleLogout = () => {
     localStorage.removeItem('userId');
     navigate('/');
   };
 
-  // Toggle profile visibility
   const handleProfileClick = () => {
-    setShowProfile(!showProfile); // Toggle the profile section on button click
+    setShowProfile(!showProfile);
   };
+  const handleContactUsClick = () => navigate('/contact');
 
   return (
     <div className="dashboard-container">
-      {/* Navbar */}
       <div className="navbar">
         <h1>User Dashboard</h1>
         <div className="navbar-buttons">
-          <button onClick={() => navigate('/')}>Home</button>
-          <button onClick={() => navigate('/contact')}>Contact Us</button> {/* Contact Us button */}
+          <button onClick={() => navigate('/home')}>Home</button>
+          <button onClick={handleContactUsClick}>Contact Us</button>
           <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
-      {/* Sidebar */}
       <div className="dashboard-content">
         <div className="sidebar">
           <button onClick={handleProfileClick}>Profile</button>
-          <button onClick={() => navigate('/order')}>Order</button>
-          <button onClick={() => navigate('/cart')}>Cart</button>
+          <button onClick={() => navigate(`/order-history/${userId}`)}>Order History</button>
         </div>
 
-        {/* Main Content */}
         <div className="main-content">
-          {showProfile && profileData && ( // Only show the profile when 'showProfile' is true
+          {showProfile && profileData && (
             <div className="profile-details">
               <h2>Profile Information</h2>
               <p><strong>Name:</strong> {profileData.firstName} {profileData.lastName}</p>
               <p><strong>Email:</strong> {profileData.email}</p>
               <p><strong>Phone Number:</strong> {profileData.phoneNo}</p>
-              <p><strong>Role:</strong> {profileData.role}</p>
               <p><strong>Wallet Balance:</strong> {profileData.walletBalance}</p>
             </div>
           )}

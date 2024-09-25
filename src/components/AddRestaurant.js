@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './AddRestaurant.css'; // Optional: You can add styles in this file
+import { toast, ToastContainer } from 'react-toastify';
+
 
 const AddRestaurant = () => {
   const [restaurantName, setRestaurantName] = useState('');
@@ -17,7 +19,7 @@ const AddRestaurant = () => {
     setRestaurantImage(event.target.files[0]);
   };
 
-  const validateForm = () => {
+  const validateForm = () => { 
     const errors = {};
 
     // Validate restaurant name (only alphabets and spaces)
@@ -68,10 +70,12 @@ const AddRestaurant = () => {
     formData.append('isOpen', isOpen);
     formData.append('restaurantImage', restaurantImage);
 
-    axios.post('http://localhost:3000/restaurant/addRestaurant', formData)
+    axios.post('http://localhost:300/restaurant/addRestaurant', formData)
       .then(response => {
         console.log('Restaurant added successfully', response.data);
         // Handle success (e.g., navigate to a different page or show a success message)
+        toast.success(response.data.message);
+
       })
       .catch(error => {
         console.error('There was an error adding the restaurant!', error);
@@ -83,7 +87,7 @@ const AddRestaurant = () => {
       <h2>Add Restaurant</h2>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div className="form-group">
-          <label htmlFor="restaurantName">Restaurant Name:</label>
+          <label htmlFor="restaurantName">Restaurant Name <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             id="restaurantName"
@@ -95,7 +99,7 @@ const AddRestaurant = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="restaurantAddress">Restaurant Address:</label>
+          <label htmlFor="restaurantAddress">Restaurant Address <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             id="restaurantAddress"
@@ -107,7 +111,7 @@ const AddRestaurant = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="contactNumber">Contact Number:</label>
+          <label htmlFor="contactNumber">Contact Number <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             id="contactNumber"
@@ -119,7 +123,7 @@ const AddRestaurant = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">Description:</label>
+          <label htmlFor="description">Description <span style={{ color: 'red' }}>*</span></label>
           <textarea
             id="description"
             value={description}
@@ -140,7 +144,7 @@ const AddRestaurant = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="restaurantImage">Restaurant Image:</label>
+          <label htmlFor="restaurantImage">Restaurant Image <span style={{ color: 'red' }}>*</span></label>
           <input
             type="file"
             id="restaurantImage"
@@ -153,6 +157,7 @@ const AddRestaurant = () => {
 
         <button type="submit">Add Restaurant</button>
       </form>
+      <ToastContainer />
     </div>
   );
 };
