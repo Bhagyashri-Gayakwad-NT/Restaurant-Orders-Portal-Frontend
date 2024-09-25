@@ -1,0 +1,45 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px ;
+  
+  background-color: rgba(0, 0, 0, 0.7); /* Slightly transparent background */
+  color: #fff;
+  position: fixed; /* Keeps the navbar at the top */
+  width: 100%;
+  top: 0;
+  z-index: 1000; /* Ensures navbar stays above other content */
+}
+
+.navbar-left h1 {
+  margin: 0;
+  font-size: 28px;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 20px;
+}
+
+.btn {
+  color: #fff;
+  text-decoration: none;
+  background-color: #007bff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.btn:active {
+  transform: scale(1);
+}

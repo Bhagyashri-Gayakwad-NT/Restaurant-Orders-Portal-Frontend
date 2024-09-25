@@ -1,0 +1,145 @@
+/* RestaurantOwnerDashboard.css */
+
+.owner-dashboard-container {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .navbar-left {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .navbar-right {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navbar-right button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .navbar-right button:hover {
+    background-color: #0056b3;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px;
+  }
+  
+  .sidebar h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #ffc107;
+  }
+  
+  .sidebar button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar button:hover {
+    background-color: #218838;
+  }
+  
+  .content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .my-profile-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .my-profile-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .profile-panel {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-details {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .profile-details h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #007bff;
+  }
+  
+  .profile-details p {
+    margin: 5px 0;
+  }
+  
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .grid-button {
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
+  
+  .grid-button:hover {
+    background-color: #218838;
+  }
+  
+  .grid-button:active {
+    background-color: #1e7e34;
+  }
+  
