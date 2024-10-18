@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import './RestaurantDetails.css';
+
 import { UserContext } from './context/UserContext'; // Import UserContext to check login status
 import { toast, ToastContainer } from 'react-toastify';
 

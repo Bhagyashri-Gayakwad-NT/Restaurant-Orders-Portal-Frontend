@@ -126,7 +126,7 @@ const OrderHistory = () => {
                 ))}
               </div>
               {cancellationStatus[order.orderId]?.canCancel && (
-                <button onClick={() => cancelOrder(order.orderId)} className="cancel-order-button">
+                <button onClick={() => cancelOrder(order.orderId)} className="cancel-order-button" style={{backgroundColor:'red'}}>
                   Cancel Order ({Math.ceil(cancellationStatus[order.orderId].timeRemaining)}s)
                 </button>
               )}

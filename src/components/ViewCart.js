@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react'; 
-import { UserContext } from './context/UserContext'; // Import UserContext
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from './context/UserContext'; 
 import Navbar from './Navbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,13 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ViewCart.css';
 
 const ViewCart = () => {
-  const { user } = useContext(UserContext); // Get user from context
+  const { user } = useContext(UserContext); 
   const { restaurantId } = useParams();
   const [cartItems, setCartItems] = useState([]);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
-  const [showAddAddressForm, setShowAddAddressForm] = useState(false); // Toggle for add address form
+  const [showAddAddressForm, setShowAddAddressForm] = useState(false); 
   const [newAddress, setNewAddress] = useState({
     street: '',
     city: '',
@@ -22,14 +22,13 @@ const ViewCart = () => {
     pinCode: ''
   });
 
-  const [errors, setErrors] = useState({}); // State for validation errors
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) return; // Ensure user is available
+    if (!user) return; 
 
-    // Fetch cart items and their images in a single operation
     const fetchCartItems = async () => {
       try {
         const cartResponse = await fetch(`http://localhost:200/cart/user/${user.id}/restaurant/${restaurantId}`);
@@ -41,7 +40,7 @@ const ViewCart = () => {
             const imageBlob = await imageResponse.blob();
             const imageUrl = URL.createObjectURL(imageBlob);
 
-            return { ...item, imageUrl }; // Add imageUrl to each cart item
+            return { ...item, imageUrl }; 
           })
         );
 
@@ -52,8 +51,10 @@ const ViewCart = () => {
     };
 
     fetchCartItems();
-
-    // Fetch user addresses
+    
+    loadAddress();
+  }, [user, restaurantId]);
+  const loadAddress = () => {
     fetch(`http://localhost:100/addresses/user/${user.id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -63,20 +64,17 @@ const ViewCart = () => {
         }
       })
       .catch((error) => console.error('Error fetching addresses:', error));
-  }, [user, restaurantId]);
-
+  }
   const validateAddress = () => {
     const newErrors = {};
     const { street, city, state, country, pinCode } = newAddress;
 
-    // Validate street
     if (!street) {
       newErrors.street = "Street is required";
     } else if (street.length < 4 || street.length > 100) {
       newErrors.street = "Street must be between 4 and 100 characters";
     }
 
-    // Validate city
     if (!city) {
       newErrors.city = "City is required";
     } else if (city.length < 3 || city.length > 50) {
@@ -85,7 +83,6 @@ const ViewCart = () => {
       newErrors.city = "City must contain only alphabetic characters";
     }
 
-    // Validate state
     if (!state) {
       newErrors.state = "State is required";
     } else if (state.length < 2 || state.length > 50) {
@@ -94,7 +91,6 @@ const ViewCart = () => {
       newErrors.state = "State must contain only alphabetic characters";
     }
 
-    // Validate country
     if (!country) {
       newErrors.country = "Country is required";
     } else if (country.length > 50) {
@@ -103,7 +99,6 @@ const ViewCart = () => {
       newErrors.country = "Country must contain only alphabetic characters";
     }
 
-    // Validate pin code
     if (!pinCode) {
       newErrors.pinCode = "Pin code is required";
     } else if (!/^[0-9]{6}$/.test(pinCode)) {
@@ -111,7 +106,7 @@ const ViewCart = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return Object.keys(newErrors).length === 0; 
   };
 
   const handleQuantityChange = (cartId, quantityChange) => {
@@ -128,15 +123,38 @@ const ViewCart = () => {
       })
       .catch((error) => console.error('Error updating cart quantity:', error));
   };
+  const handleRemoveItem = (cartId) => {
+    fetch(`http://localhost:200/cart/${cartId}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to remove item');
+        }
+        setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId));
+        toast.success('Item removed successfully');
+      })
+      .catch((error) => {
+        console.error('Error removing item:', error);
+        toast.error('Error removing item');
+      });
+  };
+
+  const calculateTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+  
 
   const handlePlaceOrder = () => {
     if (!selectedAddressId) {
-      alert('Please select a delivery address');
+      toast.error("Please log in to view your cart."); 
+     setTimeout(()=> {
+     },2000)
       return;
     }
 
     const orderData = {
-      userId: user.id, // Use user.id from context
+      userId: user.id, 
       restaurantId,
       addressId: selectedAddressId,
       cartItems: cartItems.map((item) => ({
@@ -174,14 +192,13 @@ const ViewCart = () => {
   };
 
   const handleAddAddress = () => {
-    if (!validateAddress()) return; // Validate address before submitting
+    if (!validateAddress()) return; 
 
     const addressData = {
       ...newAddress,
       userId: user.id
     };
-
-    fetch(`http://localhost:100/addresses/add`, {
+    const response = fetch(`http://localhost:100/addresses/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -190,14 +207,17 @@ const ViewCart = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setAddresses([...addresses, data]); 
+        setAddresses((prevAddresses) => Array.isArray(prevAddresses) ? [...prevAddresses, data] : [data]);
+    
         setShowAddAddressForm(false); 
-        toast.success(data.message);
+        loadAddress(); 
+        toast.success(data.successMessage); 
       })
       .catch((error) => {
         console.error('Error adding address:', error);
-        toast.error(error.message);
+        toast.error(error.message); 
       });
+    
   };
 
   return (
@@ -224,6 +244,12 @@ const ViewCart = () => {
                       <button onClick={() => handleQuantityChange(item.cartId, 1)}>+</button>
                     </div>
                     <p>Total: Rs. {item.price * item.quantity}</p>
+                    <button
+                      className="remove-button"
+                      onClick={() => handleRemoveItem(item.cartId)}
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
               ))
@@ -251,10 +277,24 @@ const ViewCart = () => {
                 )}
               </div>
 
+              
+    {/* Add this block to display the total price */}
+    <div className="total-price">
+      <h3>Total Price: Rs. {calculateTotalPrice()}</h3>
+    </div>
+
+    <button onClick={handlePlaceOrder} className="place-order-button">
+      Place Order
+    </button>
+
               <div className="add-address">
                 {showAddAddressForm ? (
                   <div>
                     <h3>Add New Address:</h3>
+
+                    <label>
+                      Street <span style={{ color: 'red' }}>*</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="Street"
@@ -262,6 +302,10 @@ const ViewCart = () => {
                       onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
                     />
                     {errors.street && <p className="error">{errors.street}</p>}
+
+                    <label>
+                      City <span style={{ color: 'red' }}>*</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="City"
@@ -269,6 +313,10 @@ const ViewCart = () => {
                       onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
                     />
                     {errors.city && <p className="error">{errors.city}</p>}
+
+                    <label>
+                      State <span style={{ color: 'red' }}>*</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="State"
@@ -276,6 +324,10 @@ const ViewCart = () => {
                       onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
                     />
                     {errors.state && <p className="error">{errors.state}</p>}
+
+                    <label>
+                      Country <span style={{ color: 'red' }}>*</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="Country"
@@ -283,6 +335,10 @@ const ViewCart = () => {
                       onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
                     />
                     {errors.country && <p className="error">{errors.country}</p>}
+
+                    <label>
+                      Pin Code <span style={{ color: 'red' }}>*</span>
+                    </label>
                     <input
                       type="text"
                       placeholder="Pin Code"
@@ -290,8 +346,9 @@ const ViewCart = () => {
                       onChange={(e) => setNewAddress({ ...newAddress, pinCode: e.target.value })}
                     />
                     {errors.pinCode && <p className="error">{errors.pinCode}</p>}
+
                     <button onClick={handleAddAddress}>Add Address</button>
-                    <button onClick={() => setShowAddAddressForm(false)}>Cancel</button>
+                    <button onClick={() => setShowAddAddressForm(false)} style={{ backgroundColor: 'red' }}>Cancel</button>
                   </div>
                 ) : (
                   <button onClick={() => setShowAddAddressForm(true)}>Add New Address</button>

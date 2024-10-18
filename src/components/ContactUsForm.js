@@ -18,16 +18,16 @@ const ContactUs = () => {
     if (!subject.trim()) {
       newErrors.subject = 'Subject is required.';
       valid = false;
-    } else if (subject.length < 1 || subject.length > 100) {
-      newErrors.subject = 'Subject must be between 1 and 100 characters.';
+    } else if (subject.length < 3 || subject.length > 100) {
+      newErrors.subject = 'Subject must be between 3 and 100 characters.';
       valid = false;
     }
 
     if (!message.trim()) {
       newErrors.message = 'Text is required.';
       valid = false;
-    } else if (message.length < 1 || message.length > 500) {
-      newErrors.message = 'Text must be between 1 and 500 characters.';
+    } else if (message.length < 5 || message.length > 500) {
+      newErrors.message = 'Text must be between 5 and 500 characters.';
       valid = false;
     }
 
@@ -38,18 +38,15 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Resetting errors before validation
     setErrors({ subject: '', message: '' });
 
-    // Validate fields before submission
     if (!validateFields()) {
-      return; // Stop submission if validation fails
+      return; 
     }
 
     setIsSubmitting(true);
     setSubmitStatus(null);
 
-    // Create JSON object instead of FormData
     const data = {
       subject: subject.trim(),
       text: message.trim(),
@@ -58,7 +55,7 @@ const ContactUs = () => {
     try {
       const response = await axios.post('http://localhost:100/users/send', data, {
         headers: {
-          'Content-Type': 'application/json', // Set content type to JSON
+          'Content-Type': 'application/json',
         },
       });
       setSubmitStatus({ type: 'success', message: 'Message sent successfully!' });
@@ -83,7 +80,7 @@ const ContactUs = () => {
         <h2>Contact Us</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="subject">Subject</label>
+            <label htmlFor="subject">Subject <span style={{ color: 'red' }}>*</span></label>
             <input
               type="text"
               id="subject"
@@ -94,7 +91,7 @@ const ContactUs = () => {
             {errors.subject && <div className="error-message">{errors.subject}</div>} {/* Error message */}
           </div>
           <div className="form-group">
-            <label htmlFor="message">Message</label>
+            <label htmlFor="message">Message <span style={{ color: 'red' }}>*</span></label>
             <textarea
               id="message"
               value={message}

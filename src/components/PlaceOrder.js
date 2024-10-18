@@ -4,7 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const PlaceOrder = () => {
-  // State to hold form data
   const [orderData, setOrderData] = useState({
     userId: '',
     restaurantId: '',
@@ -12,16 +11,13 @@ const PlaceOrder = () => {
     cartItems: [{ foodItemId: '', quantity: '', price: '' }],
   });
 
-  // State for managing success or error response
   const [message, setMessage] = useState('');
 
-  // Handle input change for form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setOrderData({ ...orderData, [name]: value });
   };
 
-  // Handle Cart Item input changes
   const handleCartItemChange = (index, e) => {
     const { name, value } = e.target;
     const cartItems = [...orderData.cartItems];
@@ -29,7 +25,6 @@ const PlaceOrder = () => {
     setOrderData({ ...orderData, cartItems });
   };
 
-  // Add new cart item
   const addCartItem = () => {
     setOrderData({
       ...orderData,
@@ -37,21 +32,18 @@ const PlaceOrder = () => {
     });
   };
 
-  // Remove cart item
   const removeCartItem = (index) => {
     const cartItems = [...orderData.cartItems];
     cartItems.splice(index, 1);
     setOrderData({ ...orderData, cartItems });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/orders/place', orderData, {
         headers: { 'Content-Type': 'application/json' },
       });
-      // setMessage(response.data.message); // Assuming response contains a 'message' field
       toast.success(response.data.message);
     } catch (error) {
       setMessage('Error placing the order. Please try again.');

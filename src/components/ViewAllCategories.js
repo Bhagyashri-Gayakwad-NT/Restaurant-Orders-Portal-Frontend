@@ -11,8 +11,26 @@ const ViewAllCategories = () => {
     const [editingCategoryId, setEditingCategoryId] = useState(null);
     const [updatedCategoryName, setUpdatedCategoryName] = useState('');
 
+    // Error messages for frontend validation
+    const [newCategoryError, setNewCategoryError] = useState('');
+    const [updateCategoryError, setUpdateCategoryError] = useState('');
+
+    // Regex and validation rules (same as backend)
+    const validateCategoryName = (categoryName) => {
+        const regex = /^[A-Za-z]{2,}(?:\s[A-Za-z]+)*$/;
+        const categoryNameTrimmed = categoryName.trim();
+        if (!categoryNameTrimmed) {
+            return "Food category name cannot be blank";
+        } else if (categoryNameTrimmed.length > 100) {
+            return "Food category name cannot exceed 100 characters";
+        } else if (!regex.test(categoryNameTrimmed)) {
+            return "Category name must contain at least two alphabets and cannot include numbers";
+        }
+        return '';
+    };
+
     useEffect(() => {
-        const userId = localStorage.getItem('userId'); // Retrieve userId from local storage
+        const userId = localStorage.getItem('userId');
         if (userId) {
             fetchRestaurants(userId);
         }
@@ -32,7 +50,7 @@ const ViewAllCategories = () => {
             console.error('Error fetching restaurants:', error);
         }
     };
-    
+
     const fetchCategories = async (restaurantId) => {
         try {
             const response = await axios.get(`http://localhost:300/categories/foodCategory/${restaurantId}`);
@@ -43,18 +61,25 @@ const ViewAllCategories = () => {
     };
 
     const handleAddCategory = async () => {
+        const error = validateCategoryName(newCategory);
+        if (error) {
+            setNewCategoryError(error);
+            return; // Do not submit the form if there's an error
+        }
+
         try {
             const response = await axios.post('http://localhost:300/categories/addFoodCategory', {
                 restaurantId: selectedRestaurantId,
                 foodCategoryName: newCategory
             });
             setCategories([...categories, response.data]);
+            fetchCategories(selectedRestaurantId);
             setNewCategory(''); // Clear the input field
+            setNewCategoryError(''); // Clear any previous error
             toast.success(response.data.message);
         } catch (error) {
             if (error.response && error.response.data && error.response.data.errors) {
                 const errors = error.response.data.errors;
-                // Loop through the errors object and display each error in Toastify
                 Object.keys(errors).forEach((field) => {
                     toast.error(errors[field]);
                 });
@@ -64,29 +89,35 @@ const ViewAllCategories = () => {
             console.error('Error adding category:', error);
         }
     };
-    
+
     const handleUpdateCategory = async (id, updatedCategory) => {
+        const error = validateCategoryName(updatedCategory.foodCategoryName);
+        if (error) {
+            setUpdateCategoryError(error);
+            return; // Do not submit if there's an error
+        }
+
         try {
             const response = await axios.put(`http://localhost:300/categories/updateFoodCategory/${id}`, {
                 restaurantId: selectedRestaurantId,
                 foodCategoryName: updatedCategory.foodCategoryName,
             });
-    
-            // Update the categories array with the updated category data
+
             const updatedCategories = categories.map((category) =>
                 category.foodCategoryId === id ? response.data : category
             );
             setCategories(updatedCategories);
-    
-            // Exit edit mode after updating
+            fetchCategories(selectedRestaurantId);
+
             setEditingCategoryId(null);
+            setUpdateCategoryError(''); // Clear any previous error
             toast.success("Category updated successfully!");
+
         } catch (error) {
-            // Handle validation errors from the backend
             if (error.response && error.response.data && error.response.data.errors) {
                 const errors = error.response.data.errors;
                 Object.keys(errors).forEach((field) => {
-                    toast.error(errors[field]); // Display each validation error
+                    toast.error(errors[field]);
                 });
             } else {
                 toast.error(error.response.data.message || 'Error updating category');
@@ -94,7 +125,6 @@ const ViewAllCategories = () => {
             console.error('Error updating category:', error);
         }
     };
-    
 
     const startEditing = (categoryId, categoryName) => {
         setEditingCategoryId(categoryId);
@@ -104,6 +134,7 @@ const ViewAllCategories = () => {
     const cancelEditing = () => {
         setEditingCategoryId(null);
         setUpdatedCategoryName('');
+        setUpdateCategoryError(''); // Clear any previous error
     };
 
     return (
@@ -134,6 +165,7 @@ const ViewAllCategories = () => {
                             onChange={(e) => setNewCategory(e.target.value)}
                             placeholder="Add New Category"
                         />
+                        {newCategoryError && <div className="error">{newCategoryError}</div>}
                         <button onClick={handleAddCategory}>Add Category</button>
                     </div>
                     <div className="categories-list">
@@ -146,15 +178,16 @@ const ViewAllCategories = () => {
                                             value={updatedCategoryName}
                                             onChange={(e) => setUpdatedCategoryName(e.target.value)}
                                         />
+                                        {updateCategoryError && <div className="error">{updateCategoryError}</div>}
                                         <button onClick={() => handleUpdateCategory(category.foodCategoryId, { foodCategoryName: updatedCategoryName })}>
                                             Save
                                         </button>
-                                        <button onClick={cancelEditing}>Cancel</button>
+                                        <button onClick={cancelEditing} style={{backgroundColor:'red'}}>Cancel</button>
                                     </>
                                 ) : (
                                     <>
                                         <span>{category.foodCategoryName}</span>
-                                        <button onClick={() => startEditing(category.foodCategoryId, category.foodCategoryName)}>Edit</button>
+                                        <button onClick={() => startEditing(category.foodCategoryId, category.foodCategoryName)} style={{backgroundColor:'#4a90e2'}}>Edit</button>
                                     </>
                                 )}
                             </div>

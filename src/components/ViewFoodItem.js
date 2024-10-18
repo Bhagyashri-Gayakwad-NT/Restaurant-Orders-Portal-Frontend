@@ -11,14 +11,21 @@ const ViewFoodItem = () => {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showAddFoodItemForm, setShowAddFoodItemForm] = useState(false);
+  const [showCategoryNotFound,setShowCategoryNotFound] = useState(true);
+  const [editErrors, setEditErrors] = useState({});
+
+  const [render, setRender] = useState(false);
+  const toggleRender = () => setRender(prev => !prev);
+
 
   const [newFoodItem, setNewFoodItem] = useState({
     foodItemName: '',
     description: '',
     price: '',
-    isAvailable: false,
+    //isAvailable: false,
     foodItemImage: null,
   });
   const [editingFoodItem, setEditingFoodItem] = useState(null);
@@ -68,7 +75,11 @@ const ViewFoodItem = () => {
 
   // Fetch food items based on selected category ID
   useEffect(() => {
+    setShowCategoryNotFound(true);
     if (selectedCategoryId) {
+      if(allFoodItems.length>0){
+        setAllFoodItems([]);
+      }
       setLoading(true);
       axios
         .get(`http://localhost:300/foodItems/getFoodItem/${selectedCategoryId}`)
@@ -84,19 +95,45 @@ const ViewFoodItem = () => {
     }
   }, [selectedCategoryId]);
 
+  const loadFoodItems = () => {
+    setLoading(true);
+    axios
+      .get(`http://localhost:300/foodItems/getFoodItem/${selectedCategoryId}`)
+      .then((response) => {
+        setFoodItems(response.data);
+
+        console.log(response.data);
+        
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching food items!', error);
+        setError('Failed to load food items.');
+        setLoading(false);
+      });
+  }
+
   // Fetch all food items based on restaurant ID
   const fetchAllFoodItemsByRestaurant = () => {
+    console.log('Function called');
+    setShowCategoryNotFound(false);
+    if(foodItems.length>0){
+      setFoodItems([]);
+      setSelectedCategoryId("");
+    }
     if (selectedRestaurantId) {
       setLoading(true);
       axios
-        .get(`http://localhost:501/foodItems/getFoodItems/${selectedRestaurantId}`)
+        .get(`http://localhost:300/foodItems/getFoodItems/${selectedRestaurantId}`)
         .then((response) => {
           setAllFoodItems(response.data);
+          //setFoodItems(response.data);
           setLoading(false);
         })
         .catch((error) => {
           console.error('Error fetching all food items!', error);
-          setError('Failed to load all food items.');
+          toast.error(error.response.data.message);
+          //setError('Failed to load all food items.');
           setLoading(false);
         });
     }
@@ -111,20 +148,106 @@ const ViewFoodItem = () => {
     }));
   };
 
+
   const handleImageChange = (e) => {
+
+    if (!validateAddFoodItem)
+      return;
     setNewFoodItem((prev) => ({
       ...prev,
       foodItemImage: e.target.files[0],
     }));
   };
 
+  const validateEditFoodItem = () => {
+    const newErrors = {};
+    const { foodItemName, description, price, } = updatedFoodItem;
+    const alphabetRegex = /^[A-Za-z\s]+$/;
+    const trimmedFoodItemName = foodItemName.trim();
+    const trimmedDescription = description.trim();
+
+
+    // Validate foodItemName
+    if (!trimmedFoodItemName) {
+      newErrors.trimmedFoodItemName = "Food item name is required";
+    } else if (!alphabetRegex.test(updatedFoodItem.trimmedFoodItemName)) {
+      newErrors.trimmedFoodItemName = "Food item name should only contain alphabets";
+    }
+
+    // Validate description
+    if (!trimmedDescription) {
+      newErrors.trimmedDescription = "Description is required";
+    }
+
+    // Validate price
+    if (!price) {
+      newErrors.price = "Price is required";
+    } else if (isNaN(updatedFoodItem.price) || updatedFoodItem.price <= 0) {
+      newErrors.price = "Price must be a valid positive number";
+    }
+
+    // if(!newFoodItem.isAvailable){
+    //   newErrors.isAvailable = "Please tick the checkbox";
+    // }
+
+    // if (!updatedFoodItem.foodItemImage) {
+    //   newErrors.foodItemImage = "Please upload image";
+    // }
+    setEditErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  const validateAddFoodItem = () => {
+    const newErrors = {};
+    const { foodItemName, description, price, } = newFoodItem;
+    const alphabetRegex = /^[A-Za-z\s]+$/;
+    const trimmedFoodItemName = foodItemName.trim();
+    const trimmedDescription = description.trim();
+
+    // Validate foodItemName
+    if (!trimmedFoodItemName) {
+      newErrors.trimmedFoodItemName = "Food item name is required";
+    } else if (!alphabetRegex.test(trimmedFoodItemName)) {
+      newErrors.trimmedFoodItemName = "Food item name must contain only alphabets and cannot include numbers";
+  }
+
+    // Validate description
+    if (!trimmedDescription) {
+      newErrors.trimmedDescription = "Description is required";
+    }
+
+    // Validate price
+    if (!price) {
+      newErrors.price = "Price is required";
+    } else if (isNaN(newFoodItem.price) || newFoodItem.price <= 0) {
+      newErrors.price = "Price must be a valid positive number";
+    }
+
+    // if(!newFoodItem.isAvailable){
+    //   newErrors.isAvailable = "Please tick the checkbox";
+    // }
+
+    if (!newFoodItem.foodItemImage) {
+      newErrors.foodItemImage = "Please upload image";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // If there are no errors, return true
+  };
+
   const handleAddFoodItem = (e) => {
     e.preventDefault();
+
+    // Run validation and if it fails, return early
+    if (!validateAddFoodItem()) {
+      return;
+    }
+
+    // Proceed with form submission only if validation passes
     const formData = new FormData();
-    formData.append('foodItemName', newFoodItem.foodItemName);
-    formData.append('description', newFoodItem.description);
+    formData.append('foodItemName', newFoodItem.foodItemName.trim());
+    formData.append('description', newFoodItem.description.trim());
     formData.append('price', newFoodItem.price);
-    formData.append('isAvailable', newFoodItem.isAvailable);
+    //formData.append('isAvailable', newFoodItem.isAvailable);
     formData.append('foodCategoryId', selectedCategoryId);
     formData.append('restaurantId', selectedRestaurantId);
     formData.append('foodItemImage', newFoodItem.foodItemImage);
@@ -141,24 +264,30 @@ const ViewFoodItem = () => {
           foodItemName: '',
           description: '',
           price: '',
-          isAvailable: false,
+          //isAvailable: false,
           foodItemImage: null,
         });
+        fetchAllFoodItemsByRestaurant();
         setError(null);
         setShowAddFoodItemForm(false); // Hide form after adding food item
-        toast.success(response.data.message)
+        toast.success(response.data.message);
       })
       .catch((error) => {
-        const errors = error.response.data.errors;
-                Object.keys(errors).forEach((field) => {
-                    toast.error(errors[field]);
-                });
-
-        console.error('Error adding food item!', error);
+        console.log(error)
+        const errors = error.response.data.message;
+        // Object.keys(errors).forEach((field) => {
+        //   toast.error(errors[field]);
+        // });
+      toast.error(errors);
+       // console.error('Error adding food item!', error);
         setError('Failed to add food item.');
       });
   };
+
   const handleEditFoodItem = (foodItem) => {
+    console.log("edit modal opened");
+    if (!validateAddFoodItem)
+      return;
     setEditingFoodItem(foodItem);
     setUpdatedFoodItem({
       foodItemName: foodItem.foodItemName,
@@ -169,6 +298,9 @@ const ViewFoodItem = () => {
   };
 
   const handleUpdateFoodItemChange = (e) => {
+    // if(!validateAddFoodItem)
+    // return;
+    setEditErrors({})
     const { name, value } = e.target;
     setUpdatedFoodItem((prev) => ({
       ...prev,
@@ -184,10 +316,16 @@ const ViewFoodItem = () => {
   };
 
   const handleUpdateFoodItem = (e) => {
+
     e.preventDefault();
+
+    if (!validateEditFoodItem()) {
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('foodItemName', updatedFoodItem.foodItemName);
-    formData.append('description', updatedFoodItem.description);
+    formData.append('foodItemName', updatedFoodItem.foodItemName.trim());
+    formData.append('description', updatedFoodItem.description.trim());
     formData.append('price', updatedFoodItem.price);
     if (updatedFoodItem.foodItemImage) {
       formData.append('foodItemImage', updatedFoodItem.foodItemImage);
@@ -200,26 +338,41 @@ const ViewFoodItem = () => {
         },
       })
       .then((response) => {
+        console.log(response);
+        
         const updatedFoodItems = foodItems.map((item) =>
           item.foodItemId === editingFoodItem.foodItemId ? { ...item, ...updatedFoodItem } : item
         );
         setFoodItems(updatedFoodItems);
+        
         setEditingFoodItem(null);
         setError(null);
+
+        // loadFoodItems();
+
+        
+        toggleRender();
+        //console.log('Before calling function');
+        fetchAllFoodItemsByRestaurant();
+       // console.log('After calling function');
+
         toast.success(response.data.message)
       })
+     
       .catch((error) => {
-        const errors = error.response.data.errors;
-                Object.keys(errors).forEach((field) => {
-                    toast.error(errors[field]);
-                });
-        console.error('Error updating food item!', error);
-        setError('Failed to update food item.');
-      });
+        const errors = error.response?.data?.errors || 'Failed to update food item.';
+        toast.error(errors);
+    });
   };
+
+  
   const fetchFoodItemImage = (id) => {
+    console.log('image', id);
+    
     return `http://localhost:300/foodItems/${id}/image`; // Image URL for food items
   };
+
+
 
   return (
     <div className="view-food-item-container">
@@ -272,6 +425,11 @@ const ViewFoodItem = () => {
         </div>
       )}
 
+      {/* No Categories Message */}
+      {selectedRestaurantId && categories.length === 0 && !loading && (
+        <p>No categories available for the selected restaurant.</p>
+      )}
+      
       {/* Fetch All Food Items Button */}
       {selectedRestaurantId && (
         <div className="fetch-food-items">
@@ -301,7 +459,7 @@ const ViewFoodItem = () => {
       {/* Food Items List for Selected Category */}
       {selectedCategoryId && (
         <div className="food-items-list">
-          <h3>Food Items for Selected Category</h3>
+        {showCategoryNotFound && <h3>Food Items for Selected Category</h3>}
           {foodItems.length > 0 ? (
             <ul>
               {foodItems.map((item) => (
@@ -317,15 +475,17 @@ const ViewFoodItem = () => {
               ))}
             </ul>
           ) : (
-            <p>No food items available for this category.</p>
+            <p>
+            {showCategoryNotFound && "No food items available for this category."}
+            </p>
           )}
         </div>
       )}
 
       {/* Toggle Button for Add Food Item Form */}
       {selectedCategoryId && (
-        <div className="toggle-add-food-item">
-          <button onClick={() => setShowAddFoodItemForm((prev) => !prev)}>
+        <div className={`toggle-add-food-item`}>
+          <button className={`${showAddFoodItemForm ? "red-bg" : ""}`} onClick={() => setShowAddFoodItemForm((prev) => !prev)}>
             {showAddFoodItemForm ? 'Cancel Adding Food Item' : 'Add Food Item'}
           </button>
         </div>
@@ -337,57 +497,54 @@ const ViewFoodItem = () => {
           <h3>Add New Food Item</h3>
           <form onSubmit={handleAddFoodItem}>
             <div>
-              {/* <label>Food Item Name :</label> */}
-              <label>Food Item Name <span style={{ color: 'red' }}>*</span> </label>
+              <label>
+                Food Item Name <span style={{ color: 'red' }}>*</span>
+              </label>
               <input
                 type="text"
                 name="foodItemName"
                 value={newFoodItem.foodItemName}
                 onChange={handleFoodItemChange}
-                required
+
               />
+              {errors.trimmedFoodItemName && <p className="error">{errors.trimmedFoodItemName}</p>}
             </div>
+
             <div>
-            <label>Description <span style={{ color: 'red' }}>*</span> </label>
+              <label>
+                Description <span style={{ color: 'red' }}>*</span>
+              </label>
               <textarea
                 name="description"
                 value={newFoodItem.description}
                 onChange={handleFoodItemChange}
-                required
+
               ></textarea>
+              {errors.trimmedDescription && <p className="error">{errors.trimmedDescription}</p>}
             </div>
+
             <div>
-            <label>Price <span style={{ color: 'red' }}>*</span> </label>
+              <label>
+                Price <span style={{ color: 'red' }}>*</span>
+              </label>
               <input
                 type="number"
                 name="price"
                 value={newFoodItem.price}
                 onChange={handleFoodItemChange}
-                required
+
               />
+              {errors.price && <p className="error">{errors.price}</p>}
             </div>
+
             <div>
               <label>
-                <input
-                  type="checkbox"
-                  name="isAvailable"
-                  checked={newFoodItem.isAvailable}
-                  onChange={(e) =>
-                    setNewFoodItem((prev) => ({
-                      ...prev,
-                      isAvailable: e.target.checked,
-                    }))
-                  }
-                />
-                Available
+                Upload Food Item Image <span style={{ color: 'red' }}>*</span>
               </label>
+              <input type="file" name="foodItemImage" onChange={handleImageChange} />
+              {errors.foodItemImage && <p className="error">{errors.foodItemImage}</p>}
             </div>
-            <div>
-              <label>Upload Food Item Image <span style={{ color: 'red' }}>*</span> </label>
-              <input type="file" name="foodItemImage" onChange={handleImageChange}
-              required
-               />
-            </div>
+
             <div>
               <button type="submit">Add Food Item</button>
             </div>
@@ -405,8 +562,8 @@ const ViewFoodItem = () => {
                 name="foodItemName"
                 value={updatedFoodItem.foodItemName}
                 onChange={handleUpdateFoodItemChange}
-                required
               />
+              {editErrors.trimmedFoodItemName && <p className="error">{editErrors.trimmedFoodItemName}</p>}
             </div>
             <div>
               <label>Description <span style={{ color: 'red' }}>*</span> </label>
@@ -414,8 +571,9 @@ const ViewFoodItem = () => {
                 name="description"
                 value={updatedFoodItem.description}
                 onChange={handleUpdateFoodItemChange}
-                required
+
               ></textarea>
+              {editErrors.trimmedDescription && <p className="error">{editErrors.trimmedDescription}</p>}
             </div>
             <div>
               <label>Price <span style={{ color: 'red' }}>*</span> </label>
@@ -424,8 +582,8 @@ const ViewFoodItem = () => {
                 name="price"
                 value={updatedFoodItem.price}
                 onChange={handleUpdateFoodItemChange}
-                required
               />
+              {editErrors.price && <p className="error">{editErrors.price}</p>}
             </div>
             <div>
               <label>Upload New Food Item Image (optional):</label>
@@ -438,7 +596,7 @@ const ViewFoodItem = () => {
           </form>
         </div>
       )}
-<ToastContainer />
+      <ToastContainer />
     </div>
   );
 };

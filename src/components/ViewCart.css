@@ -84,3 +84,71 @@
     background-color: #218838;
   }
   
+  .add-address {
+  border: 1px solid #ccc; /* Border around the form */
+  border-radius: 5px; /* Rounded corners */
+  padding: 20px; /* Space inside the form */
+  margin: 20px 0; /* Space outside the form */
+  background-color: #f9f9f9; /* Light background for contrast */
+}
+
+.add-address h3 {
+  margin-bottom: 15px; /* Space below the heading */
+}
+
+.add-address label {
+  display: block; /* Make the label take the full width */
+  margin-bottom: 5px; /* Space below the label */
+  font-weight: bold; /* Bold text for the label */
+}
+
+.add-address input {
+  width: 100%; /* Full width for input fields */
+  padding: 10px; /* Padding inside the input fields */
+  margin-bottom: 10px; /* Space below each input */
+  border: 1px solid #ccc; /* Border around the input */
+  border-radius: 4px; /* Slightly rounded corners */
+}
+
+.add-address input:focus {
+  border-color: #007bff; /* Change border color on focus */
+  outline: none; /* Remove default outline */
+}
+
+.error {
+  color: red; /* Red color for error messages */
+  font-size: 0.875rem; /* Slightly smaller font size for errors */
+  margin-top: -8px; /* Position the error message closer to the input */
+  margin-bottom: 10px; /* Space below the error message */
+}
+
+.add-address button {
+  padding: 10px 15px; /* Padding for buttons */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Button text color */
+  border: none; /* Remove default border */
+  border-radius: 4px; /* Slightly rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-right: 10px; /* Space between buttons */
+}
+
+.add-address button:hover {
+  background-color: #0056b3; /* Darker color on hover */
+}
+
+.add-address button:last-child {
+  background-color: #28a745; /* Different color for the cancel button */
+}
+
+.add-address button:last-child:hover {
+  background-color: #218838; /* Darker color on hover for the cancel button */
+}
+
+.remove-button{
+  background-color:red;
+  color:white;
+}
+
+.remove-button:hover {
+    background-color: rgb(190, 21, 21);
+  }

@@ -45,6 +45,12 @@
   min-height: 100px;
 }
 
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 .submit-button {
   width: 100%;
   padding: 0.75rem;

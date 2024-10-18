@@ -1,0 +1,89 @@
+/* General container for the home page */
+.home {
+    text-align: center;
+    background-image: url('https://images.pexels.com/photos/326281/pexels-photo-326281.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh; /* Ensures the background covers the entire viewport height */
+    padding-top: 60px; /* Adjust padding to account for the fixed navbar */
+    color: #fff; /* Ensures text is visible against the background */
+  }
+  
+  /* Content section of the home page */
+  .home-content {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay for better text readability */
+    border-radius: 10px;
+    display: inline-block;
+    width: 80%; /* Adjust width to your preference */
+    margin: 0 auto; /* Center the content horizontally */
+  }
+  
+  /* Text within the content */
+  .home p {
+    color: rgb(5, 5, 5);
+  }
+  
+  /* Grid layout for the restaurant list */
+  .restaurant-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 equal-width columns */
+    gap: 20px; /* Spacing between restaurant items */
+    margin-top: 20px;
+  }
+  
+  /* Individual restaurant item styling */
+  .restaurant-item {
+    background-color: rgba(255, 255, 255, 0.9); /* Light background for the items */
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    color: #333; /* Dark text color for readability */
+  }
+  
+  .restaurant-item h3 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+  }
+  
+  .restaurant-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .restaurant-list {
+      grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller screens */
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .restaurant-list {
+      grid-template-columns: 1fr; /* Single column for very small screens */
+    }
+  }
+  
+  
+     /* .home {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      background-image: url('https://images.pexels.com/photos/326281/pexels-photo-326281.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin: 0;
+  }
+  
+  .home-content {
+      background-color: rgba(255, 255, 255, 0.8); /* Optional: Add a semi-transparent background to make text more readable */
+     /* padding: 20px;
+      border-radius: 8px; 
+      text-align: center;
+  } */

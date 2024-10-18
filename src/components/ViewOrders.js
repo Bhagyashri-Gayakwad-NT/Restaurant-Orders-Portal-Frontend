@@ -19,6 +19,11 @@ const ViewOrders = () => {
     setSelectedRestaurantId(restaurantId);
     try {
       const orderResponse = await axios.get(`http://localhost:200/orders/restaurant/${restaurantId}`);
+      if (orderResponse.data.length === 0) {
+        // No orders found for the selected restaurant
+        toast.info("No orders found for this restaurant.");
+        setOrders([]); // Empty the orders array
+      } else {
       const ordersWithDetails = await Promise.all(
         orderResponse.data.map(async (order) => {
           const foodItemDetails = await Promise.all(
@@ -36,6 +41,7 @@ const ViewOrders = () => {
         })
       );
       setOrders(ordersWithDetails);
+    }
     } catch (error) {
       console.error("Error fetching orders", error);
     }

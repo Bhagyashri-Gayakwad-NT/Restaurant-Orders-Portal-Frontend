@@ -3,15 +3,42 @@ import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import Navbar from './Navbar';
 import './HomePage.css';
 
+import { getAllRestaurant } from '../api/service/restaurant'
+
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:300/restaurant') // Ensure the URL matches your backend
-      .then((response) => response.json())
-      .then((data) => setRestaurants(data))
-      .catch((error) => console.error('Error fetching restaurants:', error));
+    // fetch('http://localhost:300/restaurant') // Ensure the URL matches your backend
+    //   .then((response) => response.json())
+    //   .then((data) => setRestaurants(data))
+    //   .catch((error) => console.error('Error fetching restaurants:', error));
+
+    loadRestaurants();
+
   }, []);
+
+  const loadRestaurants = async () => {
+    try {
+      const response = await getAllRestaurant();
+      const data = response.data;
+      setRestaurants(data);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+    }
+
+    // getAllRestaurant()
+    // .then((response) => {
+    //   const data = response.data;
+    //   setRestaurants(data);
+    // })
+    // .catch((error) => console.error('Error fetching restaurants:', error))
+
+    // getAllRestaurant()
+    // .then((response) => response.data)
+    // .then((data) => setRestaurants(data))
+    // .catch((error) => console.error('Error fetching restaurants:', error));
+  }
 
   return (
     <div className="home">

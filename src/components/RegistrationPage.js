@@ -114,7 +114,7 @@ const RegistrationPage = () => {
       {errors.form && <p className="error">{errors.form}</p>}
       <form onSubmit={handleRegister}>
         <div className="form-group">
-          <label>First Name:</label>
+          <label>First Name <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             value={firstName}
@@ -123,7 +123,7 @@ const RegistrationPage = () => {
           {errors.firstName && <p className="error">{errors.firstName}</p>}
         </div>
         <div className="form-group">
-          <label>Last Name:</label>
+          <label>Last Name <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             value={lastName}
@@ -132,7 +132,7 @@ const RegistrationPage = () => {
           {errors.lastName && <p className="error">{errors.lastName}</p>}
         </div>
         <div className="form-group">
-          <label>Email:</label>
+          <label>Email <span style={{ color: 'red' }}>*</span></label>
           <input
             type="email"
             value={email}
@@ -141,7 +141,7 @@ const RegistrationPage = () => {
           {errors.email && <p className="error">{errors.email}</p>}
         </div>
         <div className="form-group">
-          <label>Password:</label>
+          <label>Password <span style={{ color: 'red' }}>*</span></label>
           <input
             type="password"
             value={password}
@@ -150,7 +150,7 @@ const RegistrationPage = () => {
           {errors.password && <p className="error">{errors.password}</p>}
         </div>
         <div className="form-group">
-          <label>Confirm Password:</label>
+          <label>Confirm Password <span style={{ color: 'red' }}>*</span></label>
           <input
             type="password"
             value={confirmPassword}
@@ -159,7 +159,7 @@ const RegistrationPage = () => {
           {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
         </div>
         <div className="form-group">
-          <label>Phone Number:</label>
+          <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
           <input
             type="text"
             value={phoneNo}

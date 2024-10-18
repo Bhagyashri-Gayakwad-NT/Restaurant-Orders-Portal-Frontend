@@ -1,3 +1,4 @@
+/* Updated container styling */
 .register-container {
   max-width: 400px;
   margin: 50px auto;
@@ -7,6 +8,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
+/* Header styling */
 h2 {
   margin-bottom: 25px;
   font-size: 24px;
@@ -14,6 +16,7 @@ h2 {
   text-align: center;
 }
 
+/* Form group styling */
 .form-group {
   margin-bottom: 20px;
 }
@@ -25,6 +28,7 @@ h2 {
   color: #333;
 }
 
+/* Input and select styling */
 .form-group input,
 .form-group select {
   width: 100%;
@@ -41,6 +45,7 @@ h2 {
   outline: none;
 }
 
+/* Button styling */
 .btn-submit {
   width: 100%;
   padding: 12px;
@@ -58,6 +63,7 @@ h2 {
   background-color: #0056b3;
 }
 
+/* Error message styling */
 .error {
   color: red;
   font-size: 14px;
@@ -65,11 +71,13 @@ h2 {
   font-weight: 500;
 }
 
+/* Input error state */
 .form-group input.error,
 .form-group select.error {
   border-color: red;
 }
 
+/* Select styling */
 .form-group select {
   appearance: none;
   -webkit-appearance: none;

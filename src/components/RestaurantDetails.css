@@ -1,43 +1,174 @@
+
+
+/* Add padding to the body to prevent content from hiding under the navbar */
+
+/* Adjusted the container */
 .restaurant-details {
+  /* max-width: 1200px; */
+  margin: -33px;
+  padding: 30px;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  font-size: 40px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-top: 58px;
+}
+
+/* Updated Restaurant Image Styling */
+.restaurant-image {
+  width: 100%;
+  max-width: 800px; /* Limit the maximum width */
+  height: 450px; /* Set a fixed height to ensure a consistent aspect ratio */
+  object-fit: cover; /* Crop image to fit container without distortion */
+  border-radius: 15px; /* Increase the border radius for a more elegant look */
+  margin: 0 auto 20px auto; /* Center the image and add bottom spacing */
+  display: block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+p {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  margin-left:30px;
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+/* Categories and Food Items */
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+li {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved Food Item Image Styling */
+.food-item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.food-item-details {
+  display: flex;
+  align-items: center;
+}
+
+li h4 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+li p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Button Styling */
+button {
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+button:focus {
+  outline: none;
+}
+
+.view-cart-button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #28a745;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.view-cart-button:hover {
+  background-color: #218838;
+  transform: translateY(-3px);
+}
+
+/* Responsive Styling */
+@media screen and (max-width: 768px) {
+  .restaurant-details {
     padding: 20px;
   }
-  
+
   .restaurant-image {
-    width: 400px;
-    height: auto;
-    margin-bottom: 20px;
+    max-width: 100%;
+    height: 300px; /* Adjust height for smaller screens */
   }
-  
+
+  .food-item-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
   h3 {
-    margin-top: 20px;
+    font-size: 20px;
   }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
+
+  p,
+  li p {
+    font-size: 16px;
   }
-  
-  li {
-    margin-bottom: 10px;
+
+  button,
+  .view-cart-button {
+    font-size: 16px;
+    padding: 10px 12px;
   }
-  
-  .restaurant-details {
-    margin: 20px;
-  }
-  
-  .restaurant-image, .food-item-image {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  li {
-    margin-bottom: 20px;
-  }
-   
+}

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './AddRestaurant.css'; // Optional: You can add styles in this file
+import './AddRestaurant.css'; 
 import { toast, ToastContainer } from 'react-toastify';
-
 
 const AddRestaurant = () => {
   const [restaurantName, setRestaurantName] = useState('');
@@ -22,30 +21,29 @@ const AddRestaurant = () => {
   const validateForm = () => { 
     const errors = {};
 
-    // Validate restaurant name (only alphabets and spaces)
-    if (!restaurantName.match(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)) {
-      errors.restaurantName = 'Restaurant name must contain only alphabets';
+    const trimmedRestaurantName = restaurantName.trim();
+    const trimmedRestaurantAddress = restaurantAddress.trim();
+    const trimmedContactNumber = contactNumber.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedRestaurantName.match(/^(?=.*[A-Za-z].*[A-Za-z])[A-Za-z0-9\s]+$/) || trimmedRestaurantName.length === 0) {
+      errors.restaurantName = 'Restaurant name must contain at least two alphabets and can include numbers';
     }
 
-    // Validate address (no leading or trailing spaces)
-    if (!restaurantAddress.match(/^(?!\s)(?!.*\s$).+/)) {
-      errors.restaurantAddress = 'Address cannot contain leading or trailing spaces';
+    if (trimmedRestaurantAddress.length === 0) {
+      errors.restaurantAddress = 'Address cannot be blank';
     }
 
-    // Validate contact number (starts with 9, 8, 7, or 6 and is 10 digits long)
-    if (!contactNumber.match(/^[9876]\d{9}$/)) {
+    if (!trimmedContactNumber.match(/^[9876]\d{9}$/)) {
       errors.contactNumber = 'Phone number must start with 9, 8, 7, or 6 and contain 10 digits';
     }
 
-    // Validate description (max 255 characters, no leading or trailing spaces)
-    if (!description.match(/^(?!\s)(?!.*\s$).+/)) {
-      errors.description = 'Description cannot contain leading or trailing spaces';
-    }
-    if (description.length > 255) {
+    if (trimmedDescription.length === 0) {
+      errors.description = 'Description cannot be blank';
+    } else if (trimmedDescription.length > 255) {
       errors.description = 'Description cannot exceed 255 characters';
     }
 
-    // Validate restaurant image (must be selected)
     if (!restaurantImage) {
       errors.restaurantImage = 'Restaurant image is required';
     }
@@ -63,23 +61,26 @@ const AddRestaurant = () => {
 
     const formData = new FormData();
     formData.append('userId', userId);
-    formData.append('restaurantName', restaurantName);
-    formData.append('restaurantAddress', restaurantAddress);
-    formData.append('contactNumber', contactNumber);
-    formData.append('description', description);
+    formData.append('restaurantName', restaurantName.trim());
+    formData.append('restaurantAddress', restaurantAddress.trim());
+    formData.append('contactNumber', contactNumber.trim());
+    formData.append('description', description.trim());
     formData.append('isOpen', isOpen);
     formData.append('restaurantImage', restaurantImage);
 
     axios.post('http://localhost:300/restaurant/addRestaurant', formData)
       .then(response => {
         console.log('Restaurant added successfully', response.data);
-        // Handle success (e.g., navigate to a different page or show a success message)
         toast.success(response.data.message);
-
       })
       .catch(error => {
-        console.error('There was an error adding the restaurant!', error);
-      });
+        const errorMessage = error.response && error.response.data && error.response.data.message 
+        ? error.response.data.message 
+        : 'An unexpected error occurred!';
+  
+      toast.error(errorMessage);
+  
+      console.error('There was an error adding the restaurant!', error);      });
   };
 
   return (
@@ -131,16 +132,6 @@ const AddRestaurant = () => {
             required
           ></textarea>
           {errors.description && <span className="error">{errors.description}</span>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="isOpen">Is Open:</label>
-          <input
-            type="checkbox"
-            id="isOpen"
-            checked={isOpen}
-            onChange={(e) => setIsOpen(e.target.checked)}
-          />
         </div>
 
         <div className="form-group">

@@ -1,28 +1,32 @@
 .navbar {
+  position: fixed; /* Makes the navbar stay fixed on the page */
+  top: 0; /* Fixes the navbar at the top */
+  width: 100%; /* Ensures the navbar spans the entire width */
+  background-color: #333; /* Set your preferred background color */
+  color: #fff; /* Set text color */
+  z-index: 1000; /* Ensures the navbar stays on top of other elements */
+  padding: 10px 20px; /* Padding for some space inside the navbar */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px ;
-  
-  background-color: rgba(0, 0, 0, 0.7); /* Slightly transparent background */
-  color: #fff;
-  position: fixed; /* Keeps the navbar at the top */
-  width: 100%;
-  top: 0;
-  z-index: 1000; /* Ensures navbar stays above other content */
 }
 
-.navbar-left h1 {
-  margin: 0;
-  font-size: 28px;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 1px;
+.navbar a {
+  color: #fff; /* Link text color */
+  text-decoration: none; /* Remove underline */
+  padding: 14px 20px; /* Padding for clickable area */
 }
 
-.navbar-right {
-  display: flex;
-  gap: 20px;
+.navbar a:hover {
+  background-color: #ddd; /* Hover effect */
+  color: black; /* Hover text color */
 }
+
+/* Add padding to the body to prevent content from hiding under the navbar */
+body {
+  padding-top: 60px; /* Adjust this based on the height of your navbar */
+}
+
 
 .btn {
   color: #fff;

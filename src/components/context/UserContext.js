@@ -17,6 +17,8 @@ export const UserProvider = ({ children }) => {
 
   // Function to handle user login and store in context + localStorage
   const loginUser = (userData) => {
+    console.log("Inside login user context function", userData);
+    
     localStorage.setItem('userId', userData.id);
     setUser(userData);
   };

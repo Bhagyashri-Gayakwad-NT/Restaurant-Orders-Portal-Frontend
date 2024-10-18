@@ -1,8 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { UserContext } from './context/UserContext';  // Import the UserContext
+// import axios from 'axios';
+import { UserContext } from './context/UserContext'; 
 import './LoginPage.css';
+
+import { login } from '../api/service/auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +12,7 @@ const LoginPage = () => {
   const [error, setError] = useState({});
   const navigate = useNavigate();
 
-  const { loginUser } = useContext(UserContext);  // Get loginUser from the context
+  const { loginUser } = useContext(UserContext);  
 
   const validateEmail = (email) => {
     const re = /^[A-Za-z0-9._%+-]+@nucleusteq\.com$/;
@@ -47,17 +49,19 @@ const LoginPage = () => {
     const encodedPassword = btoa(password);
 
     try {
-      const response = await axios.post('http://localhost:100/users/login', {
-        email,
-        password: encodedPassword,
-      });
+      
+      const payload = {
+        "email": email,
+        "password": encodedPassword
+      };
+
+      const response = await login(payload);
 
       const data = response.data;
 
-      // Use loginUser to store the user in context and localStorage
       loginUser(data);
-
-      // Redirect based on role
+      console.log("Logged in user data", data);
+      
       navigate(data.role === 'USER' ? '/UserDashboard' : '/RestaurantOwnerDashboard');
     } catch (error) {
       setError({ server: error.response?.data?.message || 'An error occurred. Please try again.' });
@@ -70,7 +74,7 @@ const LoginPage = () => {
       {error.server && <p className="error">{error.server}</p>}
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label>Email:</label>
+          <label>Email <span style={{ color: 'red' }}>*</span></label>
           <input
             type="email"
             value={email}
@@ -79,7 +83,7 @@ const LoginPage = () => {
           {error.email && <p className="error">{error.email}</p>}
         </div>
         <div className="form-group">
-          <label>Password:</label>
+          <label>Password <span style={{ color: 'red' }}>*</span></label>
           <input
             type="password"
             value={password}

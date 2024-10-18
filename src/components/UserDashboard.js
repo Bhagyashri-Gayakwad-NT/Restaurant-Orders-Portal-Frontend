@@ -36,7 +36,7 @@ const UserDashboard = () => {
       <div className="navbar">
         <h1>User Dashboard</h1>
         <div className="navbar-buttons">
-          <button onClick={() => navigate('/home')}>Home</button>
+          <button onClick={() => navigate('/')}>Home</button>
           <button onClick={handleContactUsClick}>Contact Us</button>
           <button onClick={handleLogout}>Logout</button>
         </div>
